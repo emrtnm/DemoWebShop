@@ -28,7 +28,7 @@ public class Main extends ChromeDriver {
         WebElement lastName=driver.findElement(By.id("LastName"));
         lastName.sendKeys("veli");
         WebElement email=driver.findElement(By.id("Email"));
-        email.sendKeys("ali3veli@gmail.com");
+        email.sendKeys("ali4veli@gmail.com");
 
         WebElement password=driver.findElement(By.id("Password"));
         password.sendKeys("aliveli123");
@@ -59,7 +59,7 @@ public class Main extends ChromeDriver {
         WebElement lastName=driver.findElement(By.id("LastName"));
         lastName.sendKeys("veli");
         WebElement email=driver.findElement(By.id("Email"));
-        email.sendKeys("ali3veli@gmail.com");
+        email.sendKeys("ali4veli@gmail.com");
 
         WebElement password=driver.findElement(By.id("Password"));
         password.sendKeys("aliveli123");
