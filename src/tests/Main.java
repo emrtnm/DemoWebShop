@@ -138,7 +138,8 @@ public class Main extends ChromeDriver {
         WebElement password = driver.findElement(By.id("Password"));
         WebElement loginBtn = driver.findElement(By.cssSelector("input[type='submit'][value='Log in']"));
 
-        email.sendKeys(UserData.email);
+        Object UserData;
+        email.sendKeys("UserData.email");
         password.sendKeys("incorrectpassword");
         loginBtn.click();
 
@@ -222,6 +223,7 @@ public class Main extends ChromeDriver {
 
         WebElement answer3 = driver.findElement(By.xpath("//div[@id='poll-block-1']//li[contains(text(), 'Very bad')]"));
         String answerText3= answer3.getText();
+        System.out.println(answerText+"\n"+answerText1+"\n"+answerText2+"\n"+answerText3);
     }
 
     @Test(priority = 8)
