@@ -186,20 +186,14 @@ public class Main extends ChromeDriver {
 
     @Test(priority = 9)
     public void US9UseCouponAndGiftCart() {
-        //SHOPPING CARD TESTCASE1 :
         driver.get("https://demowebshop.tricentis.com/");
-        driver.findElement(By.linkText("Log in")).click();
-        WebElement email=driver.findElement(By.id("Email"));
-        email.sendKeys("mehmet_yilmaz8@gmail.com");
-        WebElement pass=driver.findElement(By.id("Password"));
-        pass.sendKeys("mehmet_yilmaz8");
-        driver.findElement(By.id("RememberMe")).click();
-        driver.findElement(By.cssSelector(".button-1[type='submit'][value='Log in']")).click();
 
         JavascriptExecutor js = (JavascriptExecutor) driver;
         Actions actions = new Actions(driver);
+
         WebElement computers = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div//ul[@class='top-menu']//li/a[@href='/computers']")));
         actions.moveToElement(computers).build().perform();
+
         wait.until(ExpectedConditions.elementToBeClickable(By.linkText("Notebooks")));
         WebElement notebook = driver.findElement(By.linkText("Notebooks"));
         notebook.click();
@@ -211,7 +205,6 @@ public class Main extends ChromeDriver {
         EmptyshoppingCard.click();
 
         wait.until(ExpectedConditions.elementToBeClickable(By.name("removefromcart")));
-        //update shopping card
 
         WebElement removeFromCard= driver.findElement(By.name("removefromcart"));
         removeFromCard.click();
@@ -221,16 +214,10 @@ public class Main extends ChromeDriver {
 
         String expected = "Your Shopping Cart is empty!";
         WebElement actual = driver.findElement(By.xpath("//div[@class='order-summary-content']"));
-        System.out.println("actual.getText() = " + actual.getText());
 
-        Assert.assertTrue( actual.getText().equals(expected),"Siparis order is not empty");
-
-
-
-        //NEGATIVE COUPON CARD TESTCASE2
+        Assert.assertEquals(expected, actual.getText(), "Siparis order is not empty");
 
         driver.navigate().to("https://demowebshop.tricentis.com/");
-
 
         WebElement computersp = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div//ul[@class='top-menu']//li/a[@href='/computers']")));
         actions.moveToElement(computersp).build().perform();
@@ -238,18 +225,14 @@ public class Main extends ChromeDriver {
         WebElement notebook2 = driver.findElement(By.linkText("Notebooks"));
         notebook2.click();
 
-
         WebElement addToCardButtonn = driver.findElement(By.cssSelector("[type='button'][class='button-2 product-box-add-to-cart-button']"));
         addToCardButtonn.click();
 
-
-        //wait.until(ExpectedConditions.textToBe(By.cssSelector("p[class*='content']"),"The product has been added to your"));
-
         WebElement addedMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("p[class*='content']")));
 
-        System.out.println("Added message= " + addedMessage.getText());
         String actualMessage = "The product has been added to your shopping cart";
-        Assert.assertTrue(addedMessage.getText().equals(actualMessage),"Product added has been failed");
+        Assert.assertEquals(actualMessage, addedMessage.getText(), "Product added has been failed");
+
         driver.findElement(By.linkText("Shopping cart")).click();
         wait.until(ExpectedConditions.urlToBe("https://demowebshop.tricentis.com/cart"));
 
@@ -258,113 +241,87 @@ public class Main extends ChromeDriver {
         driver.findElement(By.name("applydiscountcouponcode")).click();
 
         WebElement couponMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='message']")));
-        System.out.println("Coupon Message= " + couponMessage.getText());
         Assert.assertTrue( couponMessage.getText().contains("couldn't"),"Coupon has been successfully added");
-
-
-
-
-
-        //NEGATIVE GIFTCARD TEST3
 
         driver.navigate().to("https://demowebshop.tricentis.com/");
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div//ul[@class='top-menu']//li/a[@href='/computers']")));
+        computers = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div//ul[@class='top-menu']//li/a[@href='/computers']")));
         new Actions(driver).moveToElement(computers).build().perform();
+
         wait.until(ExpectedConditions.elementToBeClickable(By.linkText("Notebooks")));
         driver.findElement(By.linkText("Notebooks")).click();
-
-
 
         WebElement addToCardButton2 = driver.findElement(By.cssSelector("[type='button'][class='button-2 product-box-add-to-cart-button']"));
         js.executeScript("arguments[0].scrollIntoView(true);", addToCardButton2);
         js.executeScript("arguments[0].click();", addToCardButton2);
 
-         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("p[class*='content']")));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("p[class*='content']")));
         driver.findElement(By.linkText("Shopping cart")).click();
+
         wait.until(ExpectedConditions.urlToBe("https://demowebshop.tricentis.com/cart"));
         driver.findElement(By.xpath("//div//ul[@class='top-menu']//li/a[@href='/gift-cards']")).click();
 
         driver.findElement(By.xpath("(//input[@value='Add to cart'])[1]")).click();
 
-        WebElement addtocard = driver.findElement(By.xpath("//*[@id=\"add-to-cart-button-1\"]"));
-
-        js.executeScript("arguments[0].scrollIntoView(true);", addtocard);
-        js.executeScript("arguments[0].click();", addtocard);
-
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@id='add-to-cart-button-1']")));
+        WebElement addtocard = driver.findElement(By.xpath("//input[@id='add-to-cart-button-1']"));
+        addtocard.click();
 
         wait.until(ExpectedConditions.textToBe(By.xpath("(//p[@class='content'])[1]"), "Enter valid recipient name"));
         wait.until(ExpectedConditions.textToBe(By.xpath("(//p[@class='content'])[2]"), "Enter valid recipient email"));
-        System.out.println(wait.until(ExpectedConditions.textToBe(By.xpath("(//p[@class='content'])[1]"), "Enter valid recipient name")));
-        System.out.println(wait.until(ExpectedConditions.textToBe(By.xpath("(//p[@class='content'])[2]"), "Enter valid recipient email")));
 
-        WebElement cardMessage = driver.findElement(By.xpath("(//p[@class='content'])[1]"));
-        System.out.println("cardMessage = " + cardMessage);
+        WebElement cardMessage  = driver.findElement(By.xpath("(//p[@class='content'])[1]"));
         WebElement cardMessage2 = driver.findElement(By.xpath("(//p[@class='content'])[2]"));
-        System.out.println("cardMessage2 = " + cardMessage2);
 
         Assert.assertTrue( cardMessage.getText().contains("name"),"Gift Card added successfully");
         Assert.assertTrue( cardMessage2.getText().contains("email"),"Gift Card added successfully");
-
 
         driver.findElement(By.linkText("Shopping cart")).click();
 
         WebElement giftBox = driver.findElement(By.name("giftcardcouponcode"));
         giftBox.sendKeys("");
+
         driver.findElement(By.name("applygiftcardcouponcode")).click();
         String giftMessage = "The coupon code you entered couldn't be applied to your order";
+
         WebElement giftboxMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='message']")));
-        System.out.println("Gift Card is  not Added Message= " + giftboxMessage.getText());
         Assert.assertTrue( giftboxMessage.getText().contains("couldn't"),"Coupon has been successfully added");
-
-
-
-
-        //PAYMENT POSITIVE TESTCASE4
 
         driver.navigate().to("https://demowebshop.tricentis.com/");
 
-
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div//ul[@class='top-menu']//li/a[@href='/computers']")));
+        computers = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div//ul[@class='top-menu']//li/a[@href='/computers']")));
         actions.moveToElement(computers).build().perform();
+
         wait.until(ExpectedConditions.elementToBeClickable(By.linkText("Notebooks")));
-         driver.findElement(By.linkText("Notebooks")).click();
-
-
+        driver.findElement(By.linkText("Notebooks")).click();
 
         WebElement addToCardButton1 = driver.findElement(By.cssSelector("[type='button'][class='button-2 product-box-add-to-cart-button']"));
-        js.executeScript("arguments[0].scrollIntoView(true);", addToCardButton1);
-        js.executeScript("arguments[0].click();", addToCardButton1);
-
+        addToCardButton1.click();
 
         wait.until(ExpectedConditions.textToBe(By.cssSelector("p[class*='content']"), "The product has been added to your shopping cart"));
+        addedMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("p[class*='content']")));
 
-        Assert.assertTrue(addedMessage.getText().equals(actualMessage),"Product added has been failed");
+        Assert.assertEquals(actualMessage, addedMessage.getText(), "Product added has been failed");
+
         driver.findElement(By.linkText("Shopping cart")).click();
         wait.until(ExpectedConditions.urlToBe("https://demowebshop.tricentis.com/cart"));
 
         driver.findElement(By.name("termsofservice")).click();
-
-
         driver.findElement(By.xpath("//button[@id='checkout']")).click();
 
-
-        //billing_address_id
         WebElement newA = driver.findElement(By.name("billing_address_id"));
         Select sel = new Select(newA);
         sel.selectByVisibleText("New Address");
 
-        //BILLING INFO
         driver.findElement(By.id("BillingNewAddress_Company")).sendKeys("Techno Study");
 
         WebElement counties = driver.findElement(By.xpath("//select[@data-val-number='The field Country must be a number.']"));
         Select sel1 = new Select(counties);
         sel1.selectByVisibleText("United States");
+
         WebElement AFA = driver.findElement(By.xpath("//select[@data-val-number='The field State / province must be a number.']"));
         Select sel2 = new Select(AFA);
         sel2.selectByVisibleText("California");
-
 
         driver.findElement(By.id("BillingNewAddress_City")).sendKeys("Istanbul");
         driver.findElement(By.id("BillingNewAddress_Address1")).sendKeys("Istanbul/Turkey");
@@ -374,64 +331,51 @@ public class Main extends ChromeDriver {
         driver.findElement(By.id("BillingNewAddress_FaxNumber")).sendKeys("123456");
         driver.findElement(By.xpath("(//input[@title='Continue'])[1]")).click();
 
-
         driver.findElement(By.xpath("(//input[@title='Continue'])[2]")).click();
         driver.findElement(By.xpath("//input[@onclick='ShippingMethod.save()']")).click();
         driver.findElement(By.xpath("//input[@onclick='PaymentMethod.save()']")).click();
         driver.findElement(By.xpath("//input[@onclick='PaymentInfo.save()']")).click();
         driver.findElement(By.xpath("//input[@onclick='ConfirmOrder.save()']")).click();
 
-
         wait.until(ExpectedConditions.textToBe(By.xpath("//div[@class='title']"), "Your order has been successfully processed!"));
 
         String successMessage = "Your order has been successfully processed!";
-        Assert.assertTrue( successMessage.equals("Your order has been successfully processed!"),"FAILED");
+        Assert.assertEquals(successMessage, "Your order has been successfully processed!", "FAILED");
 
         driver.findElement(By.linkText("Click here for order details.")).click();
         Assert.assertTrue(driver.getCurrentUrl().contains("orderdetails"));
 
-        //PAYMENT NEGATIVE TESTCASE 5
-
         driver.navigate().to("https://demowebshop.tricentis.com/");
-         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div//ul[@class='top-menu']//li/a[@href='/computers']")));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div//ul[@class='top-menu']//li/a[@href='/computers']")));
+
         actions.moveToElement(computers).build().perform();
         wait.until(ExpectedConditions.elementToBeClickable(By.linkText("Notebooks")));
         driver.findElement(By.linkText("Notebooks")).click();
 
-
         WebElement addToCardButton3 = driver.findElement(By.cssSelector("[type='button'][class='button-2 product-box-add-to-cart-button']"));
+        addToCardButton3.click();
 
-        js.executeScript("arguments[0].scrollIntoView(true);", addToCardButton3);
-        js.executeScript("arguments[0].click();", addToCardButton3);
+        addedMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("p[class*='content']")));
 
-
-        Assert.assertTrue( addedMessage.getText().equals(actualMessage),"Product added has been failed");
+        Assert.assertEquals(actualMessage, addedMessage.getText(), "Product added has been failed");
         driver.findElement(By.linkText("Shopping cart")).click();
         wait.until(ExpectedConditions.urlToBe("https://demowebshop.tricentis.com/cart"));
 
         driver.findElement(By.name("termsofservice")).click();
-
-
         driver.findElement(By.xpath("//button[@id='checkout']")).click();
 
-
-
-        //billing_address_id
         WebElement newAD = driver.findElement(By.name("billing_address_id"));
-         new Select(newAD).selectByValue("3220970");
+        new Select(newAD).selectByValue("3220970");
 
         driver.findElement(By.cssSelector("[onclick='Billing.save()']")).click();
 
         driver.findElement(By.name("PickUpInStore")).click();
         driver.findElement(By.cssSelector("[onclick='Shipping.save()']")).click();
 
-
-
         driver.findElement(By.id("paymentmethod_1")).click();
         driver.findElement(By.cssSelector("[onclick='PaymentMethod.save()']")).click();
 
-        String text1 =
-                driver.findElement(By.cssSelector("tr>td> :nth-child(1)")).getText();
+        String text1 = driver.findElement(By.cssSelector("tr>td> :nth-child(1)")).getText();
 
         Assert.assertTrue(text1.contains("Check or money"));
 
@@ -446,11 +390,9 @@ public class Main extends ChromeDriver {
         driver.findElement(By.id("PurchaseOrderNumber")).sendKeys("");
         driver.findElement(By.cssSelector("[onclick='PaymentInfo.save()']")).click();
 
-
         String confirm = driver.findElement(By.xpath("(//span[@class='number'])[6]")).getText();
-        System.out.println("confirm = " + confirm);
 
-        Assert.assertTrue(confirm.equals("6"),"it couldn't go to the next page");
+        Assert.assertEquals(confirm, "6", "it couldn't go to the next page");
     }
 
    @AfterClass
