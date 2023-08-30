@@ -14,6 +14,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.util.List;
+
 public class Main extends ChromeDriver {
     @Test(priority = 1)
     public void US1CreateUserAccount() {
@@ -83,7 +85,14 @@ public class Main extends ChromeDriver {
 
     @Test(priority = 10)
     public void US3Logout() {
+        driver.get("https://demowebshop.tricentis.com/");
 
+        WebElement logoutBtn = driver.findElement(By.className("ico-logout"));
+        logoutBtn.click();
+
+        List<WebElement> loginBtn = driver.findElements(By.className("ico-login"));
+
+        Assert.assertTrue(loginBtn.size() > 0, "Logout failed");
     }
 
     @Test(priority = 6)
