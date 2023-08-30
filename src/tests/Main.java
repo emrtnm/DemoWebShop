@@ -13,6 +13,36 @@ import org.testng.annotations.Test;
 public class Main extends ChromeDriver {
     @Test(priority = 1)
     public void US1CreateUserAccount() {
+        driver.get("https://demowebshop.tricentis.com/");
+
+        WebElement register=driver.findElement(By.xpath("//a[text()='Register']"));
+        register.click();
+        WebElement gender=driver.findElement(By.id("gender-male"));
+        gender.click();
+
+        WebElement firstName=driver.findElement(By.id("FirstName"));
+        firstName.sendKeys(UserData.firstname);
+
+        WebElement lastName=driver.findElement(By.id("LastName"));
+        lastName.sendKeys(UserData.lastname);
+
+        WebElement email=driver.findElement(By.id("Email"));
+        email.sendKeys(UserData.email);
+
+        WebElement password=driver.findElement(By.id("Password"));
+        password.sendKeys(UserData.password);
+
+        WebElement confirmPass=driver.findElement(By.id("ConfirmPassword"));
+        confirmPass.sendKeys(UserData.password);
+
+        WebElement registerButton=driver.findElement(By.id("register-button"));
+        registerButton.click();
+
+        WebElement control=driver.findElement(By.xpath("//div[@class='result']"));
+        Assert.assertTrue(control.getText().contains("Your registration completed"),"your registration is not complete");
+
+        WebElement logoutBtn = driver.findElement(By.className("ico-logout"));
+        logoutBtn.click();
 
     }
 
