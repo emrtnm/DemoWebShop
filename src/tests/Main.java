@@ -11,7 +11,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class Main extends ChromeDriver {
-    @Test(priority = 2)
+    @Test(priority = 1)
     public void US1CreateUserAccount() {
         driver.get("https://demowebshop.tricentis.com/");
 
@@ -45,7 +45,7 @@ public class Main extends ChromeDriver {
         logoutBtn.click();
     }
 
-    @Test(priority = 1)
+    @Test(priority = 2)
     public void US2CreateNegativeUserAccount() {
         driver.get("https://demowebshop.tricentis.com/");
 
@@ -61,7 +61,7 @@ public class Main extends ChromeDriver {
         lastName.sendKeys(UserData.lastname);
 
         WebElement email=driver.findElement(By.id("Email"));
-        email.sendKeys("ali2veli@gmail.com");
+        email.sendKeys(UserData.email);
 
         WebElement password=driver.findElement(By.id("Password"));
         password.sendKeys(UserData.password);
