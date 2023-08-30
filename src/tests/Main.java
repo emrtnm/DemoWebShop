@@ -176,12 +176,89 @@ public class Main extends ChromeDriver {
 
     @Test(priority = 11)
     public void US7SurveyResponse() {
+        driver.get("https://demowebshop.tricentis.com/");
 
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//label[contains(text(), 'Excellent')]")));
+        WebElement resultsEX_button = driver.findElement(By.xpath("//label[contains(text(), 'Excellent')]"));
+        resultsEX_button.click();
+
+        WebElement resultsGood_button = driver.findElement(By.xpath("//label[contains(text(), 'Good')]"));
+        resultsGood_button.click();
+
+        WebElement resultspoor_button = driver.findElement(By.xpath("//label[contains(text(), 'Poor')]"));
+        resultspoor_button.click();
+
+        WebElement resultsBad_button = driver.findElement(By.xpath("//label[contains(text(), 'Very bad')]"));
+        resultsBad_button.click();
+
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@id='vote-poll-1']")));
+        WebElement Votebutton = driver.findElement(By.xpath("//input[@id='vote-poll-1']"));
+        Votebutton.click();
+
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@class='ico-login' ]")));
+        WebElement login = driver.findElement(By.xpath("//a[@class='ico-login' ]"));
+        login.click();
+
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='Email']")));
+        WebElement email1 = driver.findElement(By.xpath("//*[@id='Email']"));
+        email1.sendKeys("alicebbar@gmail.com");
+
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='Password']")));
+        WebElement pswrd = driver.findElement(By.xpath("//*[@id='Password']"));
+        pswrd.sendKeys("Cebbarali123");
+
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@class='button-1 login-button']")));
+        WebElement login1 = driver.findElement(By.xpath("//input[@class='button-1 login-button']"));
+        login1.click();
+
+        WebElement answer = driver.findElement(By.xpath("//div[@id='poll-block-1']//li[contains(text(), 'Excellent')]"));
+        String answerText= answer.getText();
+
+        WebElement answer1 = driver.findElement(By.xpath("//div[@id='poll-block-1']//li[contains(text(), 'Good')]"));
+        String answerText1= answer1.getText();
+
+        WebElement answer2 = driver.findElement(By.xpath("//div[@id='poll-block-1']//li[contains(text(), 'Poor')]"));
+        String answerText2= answer2.getText();
+
+        WebElement answer3 = driver.findElement(By.xpath("//div[@id='poll-block-1']//li[contains(text(), 'Very bad')]"));
+        String answerText3= answer3.getText();
     }
 
     @Test(priority = 8)
     public void US8DownloadHistory() {
+        driver.get("https://demowebshop.tricentis.com/");  
+        
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@class='ico-login' ]")));
+        WebElement login = driver.findElement(By.xpath("//a[@class='ico-login' ]"));
+        login.click();
+        
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='Email']")));
+        WebElement email1 = driver.findElement(By.xpath("//*[@id='Email']"));
+        email1.sendKeys("alicebbar@gmail.com");
+        
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='Password']")));
+        WebElement pswrd = driver.findElement(By.xpath("//*[@id='Password']"));
+        pswrd.sendKeys("Cebbarali123");
+        
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@class='button-1 login-button']")));
+        WebElement login1 = driver.findElement(By.xpath("//input[@class='button-1 login-button']"));
+        login1.click();
 
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@class='account']")));
+        WebElement account = driver.findElement(By.xpath("//*[@class='account']"));
+        account.click();
+        
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[contains(text(), 'Orders')]")));
+        WebElement order1 = driver.findElement(By.xpath("//a[contains(text(), 'Orders')]"));
+        order1.click();
+
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@value='Details']")));
+        WebElement details1 = driver.findElement(By.xpath("//input[@value='Details']"));
+        details1.click();
+        
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[contains(text(), 'PDF')]")));
+        WebElement pdfInvoice = driver.findElement(By.xpath("//a[contains(text(), 'PDF')]"));
+        pdfInvoice.click();
     }
 
     @Test(priority = 9)
