@@ -106,6 +106,7 @@ public class Main extends ChromeDriver {
     @Test
     public void US8DownloadHistory() {
 
+
     }
 
     @Test
@@ -192,9 +193,10 @@ public class Main extends ChromeDriver {
         //NEGATIVE GIFTCARD TEST3
 
         driver.navigate().to("https://demowebshop.tricentis.com/");
+        driver.navigate().refresh();
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div//ul[@class='top-menu']//li/a[@href='/computers']")));
-        new Actions(driver).moveToElement(computers).build().perform();
+        WebElement computersp2 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div//ul[@class='top-menu']//li/a[@href='/computers']")));
+        actions.moveToElement(computersp2).build().perform();
         wait.until(ExpectedConditions.elementToBeClickable(By.linkText("Notebooks")));
         driver.findElement(By.linkText("Notebooks")).click();
 
@@ -209,23 +211,27 @@ public class Main extends ChromeDriver {
         wait.until(ExpectedConditions.urlToBe("https://demowebshop.tricentis.com/cart"));
         driver.findElement(By.xpath("//div//ul[@class='top-menu']//li/a[@href='/gift-cards']")).click();
 
-        driver.findElement(By.xpath("(//input[@value='Add to cart'])[1]")).click();
 
-        WebElement addtocard = driver.findElement(By.xpath("//*[@id=\"add-to-cart-button-1\"]"));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//*[@class='button-2 product-box-add-to-cart-button'])[1]")));
+        driver.findElement(By.xpath("(//*[@class='button-2 product-box-add-to-cart-button'])[1]")).click();
 
-        js.executeScript("arguments[0].scrollIntoView(true);", addtocard);
-        js.executeScript("arguments[0].click();", addtocard);
+        WebElement addtocardd = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[class='button-1 add-to-cart-button'][data-productid='1']")));
 
+        js.executeScript("arguments[0].scrollIntoView(true);", addtocardd);
+        js.executeScript("arguments[0].click();", addtocardd);
+        //addtocard.click();
 
-        wait.until(ExpectedConditions.textToBe(By.xpath("(//p[@class='content'])[1]"), "Enter valid recipient name"));
-        wait.until(ExpectedConditions.textToBe(By.xpath("(//p[@class='content'])[2]"), "Enter valid recipient email"));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//p[@class='content'])[1]")));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//p[@class='content'])[2]")));
+
         System.out.println(wait.until(ExpectedConditions.textToBe(By.xpath("(//p[@class='content'])[1]"), "Enter valid recipient name")));
         System.out.println(wait.until(ExpectedConditions.textToBe(By.xpath("(//p[@class='content'])[2]"), "Enter valid recipient email")));
 
+
         WebElement cardMessage = driver.findElement(By.xpath("(//p[@class='content'])[1]"));
-        System.out.println("cardMessage = " + cardMessage);
+        System.out.println("cardMessage = " + cardMessage.getText());
         WebElement cardMessage2 = driver.findElement(By.xpath("(//p[@class='content'])[2]"));
-        System.out.println("cardMessage2 = " + cardMessage2);
+        System.out.println("cardMessage2 = " + cardMessage2.getText());
 
         Assert.assertTrue( cardMessage.getText().contains("name"),"Gift Card added successfully");
         Assert.assertTrue( cardMessage2.getText().contains("email"),"Gift Card added successfully");
@@ -251,13 +257,13 @@ public class Main extends ChromeDriver {
 
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div//ul[@class='top-menu']//li/a[@href='/computers']")));
-        actions.moveToElement(computers).build().perform();
+        new Actions(driver).moveToElement(computers).build().perform();
         wait.until(ExpectedConditions.elementToBeClickable(By.linkText("Notebooks")));
          driver.findElement(By.linkText("Notebooks")).click();
 
 
 
-        WebElement addToCardButton1 = driver.findElement(By.cssSelector("[type='button'][class='button-2 product-box-add-to-cart-button']"));
+        WebElement addToCardButton1 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[type='button'][class='button-2 product-box-add-to-cart-button']")));
         js.executeScript("arguments[0].scrollIntoView(true);", addToCardButton1);
         js.executeScript("arguments[0].click();", addToCardButton1);
 
