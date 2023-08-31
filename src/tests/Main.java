@@ -201,7 +201,6 @@ public class Main extends ChromeDriver {
 
         // clicking its link under the image.
         driver.navigate().back();
-
         WebElement productSelection02 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("14.1-inch Laptop")));
         productSelection02.click();
 
