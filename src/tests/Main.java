@@ -179,402 +179,256 @@ public class Main extends ChromeDriver {
     }
 
     @Test(priority = 7)
-    public void US6Ordering() {
+    public void US6Ordering() throws AWTException {
         driver.navigate().to("https://demowebshop.tricentis.com/");
 
-        // 0- The user logs in
+        WebElement loginLink = driver.findElement(By.xpath("//a[text()='Log in']"));
+        loginLink.click();
 
-        driver.findElement(By.xpath("//*[text()='Log in']")).click();
-        driver.findElement(By.xpath("//input[@id='Email']")).sendKeys("alicabbar@gmail.com");
-        driver.findElement(By.xpath("//input[@id='Password']")).sendKeys("alicabbar1234");
-        driver.findElement(By.xpath("//input[@value='Log in']")).click();
-        MyFunc.Wait(2);
+        WebElement email    = driver.findElement(By.id("Email"));
+        WebElement password = driver.findElement(By.id("Password"));
+        WebElement loginBtn = driver.findElement(By.cssSelector("input[type='submit'][value='Log in']"));
 
-        // 1- The user selects "14.1-inch Laptop" product from the product list on the homepage
-        // by clicking its image or its link under the image.
+        email.sendKeys(UserData.email);
+        password.sendKeys(UserData.password);
+        loginBtn.click();
 
-        // clicking its image.
         WebElement productSelection01 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div[4]/div[1]/div[4]/div[3]/div/div/div[3]/div[3]/div/div[1]/a/img")));
         productSelection01.click();
-        MyFunc.Wait(2);
 
         WebElement productMessage01 = driver.findElement(By.xpath("//h1[@itemprop='name']"));
-        Assert.assertTrue("The product is not '14.1-inch Laptop'",productMessage01.getText().contains("14.1-inch Laptop"));
+        Assert.assertTrue(productMessage01.getText().contains("14.1-inch Laptop"), "The product is not '14.1-inch Laptop'");
 
-        // clicking its link under the image.
         driver.navigate().back();
-        MyFunc.Wait(2);
 
-        WebElement productSelection02 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[text()='14.1-inch Laptop']")));
+        WebElement productSelection02 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//a[text()='14.1-inch Laptop'])[1]")));
         productSelection02.click();
-        MyFunc.Wait(2);
 
         WebElement productMessage02 = driver.findElement(By.xpath("//h1[@itemprop='name']"));
-        Assert.assertTrue("The product is not '14.1-inch Laptop'",productMessage02.getText().contains("14.1-inch Laptop"));
+        Assert.assertTrue(productMessage02.getText().contains("14.1-inch Laptop"), "The product is not '14.1-inch Laptop'");
 
-        // 2- The user adds the product to the shopping cart by clicking the "Add To Cart" button
-        // and confirm the selected product is added into the shopping cart.
-
-        WebElement addToCartButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id=\"add-to-cart-button-31\"]")));
+        WebElement addToCartButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='add-to-cart-button-31']")));
         addToCartButton.click();
-        MyFunc.Wait(2);
 
         WebElement addToCartMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//p[text()='The product has been added to your ']")));
-        Assert.assertTrue("Product has not been added to shopping cart", addToCartMessage.isDisplayed());
-
-        // 3- The user goes to the shopping cart and selects the appropriate option by clicking
-        // "Country" dropbox  "State/province" dropbox and "Zip/postal code" textbox for cargo information.
+        Assert.assertTrue(addToCartMessage.isDisplayed(), "Product has not been added to shopping cart");
 
         driver.findElement(By.xpath("//span[text()='Shopping cart']")).click();
-        MyFunc.Wait(2);
 
-        // positive scenario, avaliable address is used for the dropboxes and textbox.
         driver.findElement(By.xpath("//input[@name='estimateshipping']")).click();
 
         WebElement firstShippingMessage01 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//li[@class='shipping-option-item']/strong)[1]")));
-        Assert.assertTrue("Shipping message is not seen", firstShippingMessage01.getText().contains("Ground"));
-        MyFunc.Wait(2);
+        Assert.assertTrue(firstShippingMessage01.getText().contains("Ground"), "Shipping message is not seen");
 
-        // negative scenario, when the country, state and zip/postal code boxes are changed.
-        WebElement countryDropbox = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id='CountryId']")));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("CountryId")));
+        WebElement countryDropbox = driver.findElement(By.id("CountryId"));
         new Select(countryDropbox).selectByVisibleText("United States");
-        MyFunc.Wait(2);
 
-        WebElement stateDropbox = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id='StateProvinceId']")));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("StateProvinceId")));
+        WebElement stateDropbox = driver.findElement(By.id("StateProvinceId"));
         new Select(stateDropbox).selectByVisibleText("Arizona");
-        MyFunc.Wait(2);
 
         new Robot().keyPress(KeyEvent.VK_TAB);
         new Robot().keyRelease(KeyEvent.VK_TAB);
-        MyFunc.Wait(2);
+
         new Robot().keyPress(KeyEvent.VK_DELETE);
         new Robot().keyRelease(KeyEvent.VK_DELETE);
-        MyFunc.Wait(2);
 
         WebElement zipPostalCode = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='ZipPostalCode']")));
         zipPostalCode.sendKeys("85004-1558");
-        MyFunc.Wait(2);
-
-        // 4- The user clicks estimate shipping button to see the estimated delivery time of product
 
         driver.findElement(By.xpath("//input[@name='estimateshipping']")).click();
 
         WebElement firstShippingMessage02 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//li[@class='shipping-option-item']/strong)[1]")));
-        Assert.assertTrue("Shipping message is not seen", firstShippingMessage02.getText().contains("Ground"));
-        MyFunc.Wait(2);
+        Assert.assertTrue(firstShippingMessage02.getText().contains("Ground"), "Shipping message is not seen");
 
-        // 5- The user marks the "agree" confirmation box to accept conditions.
-
-        // negative scenario, the user clicks checkout button without marking the "agree" confirmation box.
         WebElement checkout = driver.findElement(By.xpath("//button[@id='checkout']"));
         checkout.click();
-        MyFunc.Wait(2);
 
         WebElement termsOfServiceMessage = driver.findElement(By.xpath("//button[@role='button']"));
         termsOfServiceMessage.click();
-        MyFunc.Wait(2);
 
-        // positive scenario, "agree" confirmation box is marked.
         driver.findElement(By.xpath("//input[@id='termsofservice']")).click();
-        MyFunc.Wait(2);
-
-        // 6- The user starts payment by clicking the "Checkout" button.
-
         checkout.click();
-        MyFunc.Wait(2);
 
-        // 7- The user selects the avaliable invoice address or enters a new address
-        // and clicks the continue button.
-
-        // avaliable invoice address
         WebElement billingAddressDropbox = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id='billing-address-select']")));
         new Select(billingAddressDropbox).selectByIndex(0);
-        MyFunc.Wait(2);
 
         WebElement billingSaveContinueButton01 = driver.findElement(By.xpath("//input[@onclick='Billing.save()']"));
         billingSaveContinueButton01.click();
-        MyFunc.Wait(2);
 
         WebElement shippingBackButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@id='shipping-buttons-container']/p/a")));
         shippingBackButton.click();
-        MyFunc.Wait(2);
 
-        // enters a new address
-
-        // negative scenario, all necessary fields are empty.
         new Select(billingAddressDropbox).selectByIndex(1);
-        MyFunc.Wait(2);
 
         WebElement billingSaveContinueButton02 = driver.findElement(By.xpath("//input[@onclick='Billing.save()']"));
         billingSaveContinueButton02.click();
-        MyFunc.Wait(2);
 
         WebElement oneOfNecessaryAddressElements = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='Country is required.']")));
-        Assert.assertTrue("Required field is entered !",oneOfNecessaryAddressElements.isDisplayed());
+        Assert.assertTrue(oneOfNecessaryAddressElements.isDisplayed(), "Required field is entered !");
 
-        // positive scenario, all necessary fields are filled up.
         WebElement billingNewAddressCountryDropbox = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id='BillingNewAddress_CountryId']")));
         new Select(billingNewAddressCountryDropbox).selectByIndex(1);// United States
-        MyFunc.Wait(2);
 
         WebElement billingNewAddressStateDropbox = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id='BillingNewAddress_StateProvinceId']")));
         new Select(billingNewAddressStateDropbox).selectByIndex(6);// Arizona
-        MyFunc.Wait(2);
 
-        //103 E PALM LN PHOENIX AZ 85004-1558 USA
         WebElement billingNewAddressCity = driver.findElement(By.xpath("//input[@id='BillingNewAddress_City']"));
         billingNewAddressCity.sendKeys("Phoenix");
-        MyFunc.Wait(2);
 
         WebElement billingNewAddress1 = driver.findElement(By.xpath("//input[@id='BillingNewAddress_Address1']"));
         billingNewAddress1.sendKeys("103 E PALM LN");
-        MyFunc.Wait(2);
 
         WebElement billingNewAddressZip = driver.findElement(By.xpath("//input[@id='BillingNewAddress_ZipPostalCode']"));
         billingNewAddressZip.sendKeys("85004-1558");
-        MyFunc.Wait(2);
 
         WebElement billingNewAddressPhoneNumber = driver.findElement(By.xpath("//input[@id='BillingNewAddress_PhoneNumber']"));
         billingNewAddressPhoneNumber.sendKeys("(520)-520-1234");
-        MyFunc.Wait(5);
 
         WebElement billingSaveContinueButton03 = driver.findElement(By.xpath("//input[@onclick='Billing.save()']"));
         billingSaveContinueButton03.click();
-        MyFunc.Wait(2);
 
-        // 8- When the user selects the "In-Store Pickup" option,
-        // verifies that the shipping address is lost.
-        // Then the user clicks the continue button.
-
-        // negative scenario, In-Store Pickup" option is not selected
         WebElement shippingSaveContinueButton02 = driver.findElement(By.xpath("//input[@onclick='Shipping.save()']"));
         shippingSaveContinueButton02.click();
-        MyFunc.Wait(2);
 
         driver.findElement(By.xpath("//input[@id='shippingoption_0']//following::label")).click();
-        MyFunc.Wait(2);
-
         driver.findElement(By.xpath("//input[@id='shippingoption_1']//following::label")).click();
-        MyFunc.Wait(2);
-
         driver.findElement(By.xpath("//input[@id='shippingoption_2']//following::label")).click();
-        MyFunc.Wait(2);
 
         WebElement shippingMethodSaveContinueButton = driver.findElement(By.xpath("//input[@onclick='ShippingMethod.save()']"));
         shippingMethodSaveContinueButton.click();
-        MyFunc.Wait(2);
 
         WebElement paymentMethodBackButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@id='payment-method-buttons-container']/p/a")));
         paymentMethodBackButton.click();
-        MyFunc.Wait(2);
 
         WebElement shippingMethodBackButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@id='shipping-method-buttons-container']/p/a")));
         shippingMethodBackButton.click();
-        MyFunc.Wait(2);
 
-        //positive scenario
         driver.findElement(By.xpath("//input[@id='PickUpInStore']")).click();
-        MyFunc.Wait(2);
+        
         WebElement shippingAddressSelectMessage = driver.findElement(By.xpath("//label[text()='Select a shipping address from your address book or enter a new address.']"));
-        Assert.assertFalse("Address message is still displayed", shippingAddressSelectMessage.isDisplayed());
+        Assert.assertFalse(shippingAddressSelectMessage.isDisplayed(), "Address message is still displayed");
 
         WebElement shippingSaveContinueButton01 = driver.findElement(By.xpath("//input[@onclick='Shipping.save()']"));
         shippingSaveContinueButton01.click();
-        MyFunc.Wait(2);
 
-        // 9- The user chooses the payment method (Cash on,Check/MoneyOrder,Credit Card, Purchase Order )
-        // and clicks the continue button.
-        // If the user has selected the Cash on or Check/MoneyOrder payment method
-        // verifies the payment information message of selected payment method
-        // or enters necessary payment  information into the textboxes
-
-        // 9 (a)- If the user has selected the Cash on or Check/MoneyOrder
-        // he/she verifies the payment method by checking message occuring in the "Payment Information" section
-        // and if it is true clicks the continue button.
-
-        // cash on delivery
         WebElement cashOnDelivery = driver.findElement(By.xpath("//input[@id='paymentmethod_0']"));
         cashOnDelivery.click();
-        MyFunc.Wait(2);
 
         WebElement cashOnDeliveryContinueButton = driver.findElement(By.xpath("//input[@onclick='PaymentMethod.save()']"));
         cashOnDeliveryContinueButton.click();
-        MyFunc.Wait(2);
 
         WebElement cashOnDeliveryMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@id='checkout-payment-info-load']//p")));
-        Assert.assertTrue("Message has not been shown !", cashOnDeliveryMessage.isDisplayed());
+        Assert.assertTrue(cashOnDeliveryMessage.isDisplayed(), "Message has not been shown !");
 
         WebElement cashOnDeliveryBackButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@id='payment-info-buttons-container']/p/a")));
         cashOnDeliveryBackButton.click();
-        MyFunc.Wait(2);
 
-        // 9 (b)- If the user has selected the Cash on or Check/MoneyOrder
-        // he/she verifies the payment method  by checking message occuring in the "Payment Information" section
-        // and if it is true clicks the continue button.
-
-        // check / money order
         WebElement checkMoneyOrder = driver.findElement(By.xpath("//input[@id='paymentmethod_1']"));
         checkMoneyOrder.click();
-        MyFunc.Wait(2);
 
         WebElement checkMoneyOrderContinueButton = driver.findElement(By.xpath("//input[@onclick='PaymentMethod.save()']"));
         checkMoneyOrderContinueButton.click();
-        MyFunc.Wait(2);
 
         WebElement checkMoneyOrderMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//b[text()='Tricentis GmbH']")));
-        Assert.assertTrue("Check / Money order has not been completed !", checkMoneyOrderMessage.isDisplayed());
+        Assert.assertTrue(checkMoneyOrderMessage.isDisplayed(), "Check / Money order has not been completed !");
 
         WebElement checkMoneyOrderBackButton = driver.findElement(By.xpath("//div[@id='payment-info-buttons-container']/p/a"));
         checkMoneyOrderBackButton.click();
-        MyFunc.Wait(2);
 
-        // 9 (c) If the user has selected the Credit Card or Purchase Order in the "Payment Method",
-        // he/she enters the payment details in the "Payment Information" section
-        // and if it is true clicks the continue button.
-
-        // credit card
-        // negative scenario 01, credit card fields are empty
         WebElement creditCard = driver.findElement(By.xpath("//input[@id='paymentmethod_2']"));
         creditCard.click();
-        MyFunc.Wait(2);
 
         WebElement creditCardContinueButton01 = driver.findElement(By.xpath("//input[@onclick='PaymentMethod.save()']"));
         creditCardContinueButton01.click();
-        MyFunc.Wait(2);
 
         WebElement creditCardInfoContinueButton01 = driver.findElement(By.xpath("//input[@onclick='PaymentInfo.save()']"));
         creditCardInfoContinueButton01.click();
-        MyFunc.Wait(2);
 
         WebElement creditCardInfoMessage01 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//li[text()='Wrong card number']")));
-        Assert.assertTrue("Right card Number !", creditCardInfoMessage01.isDisplayed());
-        MyFunc.Wait(2);
+        Assert.assertTrue(creditCardInfoMessage01.isDisplayed(), "Right card Number !");
 
-        // negative scenario 02, credit card fields are filled up except cardholder name
         WebElement creditCardHolderName01 = driver.findElement(By.xpath("//input[@id='CardholderName']"));
         creditCardHolderName01.sendKeys("Ali Cabbar");
-        MyFunc.Wait(2);
 
         creditCardInfoContinueButton01.click();
-        MyFunc.Wait(2);
 
         WebElement creditCardInfoMessageCardHolderName = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='checkout-payment-info-load']/div/div/div[2]/div/ul/li[1]")));
-        Assert.assertTrue("Card holder name has been entered !", creditCardInfoMessageCardHolderName.isDisplayed());
-        MyFunc.Wait(2);
+        Assert.assertTrue(creditCardInfoMessageCardHolderName.isDisplayed(), "Card holder name has been entered !");
 
-        // negative scenario 03, credit card fields are filled up except credit card number
         WebElement creditCardNumber01 = driver.findElement(By.xpath("//input[@id='CardNumber']"));
         creditCardNumber01.sendKeys("5555 5555 5555 5555");
-        MyFunc.Wait(2);
 
         creditCardInfoContinueButton01.click();
-        MyFunc.Wait(2);
 
         WebElement creditCardInfoMessageCardNumber = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='checkout-payment-info-load']/div/div/div[2]/div/ul/li[1]")));
-        Assert.assertTrue("Right card number !", creditCardInfoMessageCardNumber.isDisplayed());
-        MyFunc.Wait(2);
+        Assert.assertTrue(creditCardInfoMessageCardNumber.isDisplayed(), "Right card number !");
 
-        // negative scenario 04, credit card fields are filled up except credit card code
         WebElement creditCardCode01 = driver.findElement(By.xpath("//input[@id='CardCode']"));
         creditCardCode01.sendKeys("555");
-        MyFunc.Wait(2);
-
         creditCardInfoContinueButton01.click();
-        MyFunc.Wait(2);
 
         WebElement creditCardInfoMessageCardCode = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='checkout-payment-info-load']/div/div/div[2]/div/ul/li")));
-        Assert.assertTrue("Right card code !", creditCardInfoMessageCardCode.isDisplayed());
-        MyFunc.Wait(2);
+        Assert.assertTrue(creditCardInfoMessageCardCode.isDisplayed(), "Right card code !");
 
         WebElement creditCardBackButton = driver.findElement(By.xpath("//div[@id='payment-info-buttons-container']/p/a"));
         creditCardBackButton.click();
-        MyFunc.Wait(2);
 
-        // positive scenario, all credit card fields are filled up
         WebElement creditCardContinueButton02 = driver.findElement(By.xpath("//input[@onclick='PaymentMethod.save()']"));
         creditCardContinueButton02.click();
-        MyFunc.Wait(2);
 
         WebElement creditCardTypeDropBox = driver.findElement(By.xpath("//select[@id='CreditCardType']"));
 
         new Select(creditCardTypeDropBox).selectByIndex(1);
-        MyFunc.Wait(2);
         new Select(creditCardTypeDropBox).selectByIndex(2);
-        MyFunc.Wait(2);
         new Select(creditCardTypeDropBox).selectByIndex(3);
-        MyFunc.Wait(2);
         new Select(creditCardTypeDropBox).selectByIndex(0);
-        MyFunc.Wait(2);
 
         WebElement creditCardHolderName02 = driver.findElement(By.xpath("//input[@id='CardholderName']"));
         creditCardHolderName02.sendKeys("Ali Cabbar");
-        MyFunc.Wait(2);
 
         WebElement creditCardNumber02 = driver.findElement(By.xpath("//input[@id='CardNumber']"));
         creditCardNumber02.sendKeys("5555 5555 5555 5555");
-        MyFunc.Wait(2);
 
         WebElement creditCardExpirationDateMonthDropBox = driver.findElement(By.xpath("//select[@id='ExpireMonth']"));
         new Select(creditCardExpirationDateMonthDropBox).selectByIndex(1);
-        MyFunc.Wait(2);
 
         WebElement creditCardExpirationDateYearDropBox = driver.findElement(By.xpath("//select[@id='ExpireYear']"));
         new Select(creditCardExpirationDateYearDropBox).selectByIndex(1);
-        MyFunc.Wait(2);
 
         WebElement creditCardCode02 = driver.findElement(By.xpath("//input[@id='CardCode']"));
         creditCardCode02.sendKeys("555");
-        MyFunc.Wait(2);
 
         WebElement creditCardInfoContinueButton02 = driver.findElement(By.xpath("//input[@onclick='PaymentInfo.save()']"));
         creditCardInfoContinueButton02.click();
-        MyFunc.Wait(2);
 
         WebElement creditCardInfoMessage02 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//li[text()='Wrong card number']")));
-        Assert.assertTrue("Right card Number !", creditCardInfoMessage02.isDisplayed());
-        MyFunc.Wait(2);
+        Assert.assertTrue(creditCardInfoMessage02.isDisplayed(), "Right card Number !");
 
         WebElement creditCardBackButton02 = driver.findElement(By.xpath("//div[@id='payment-info-buttons-container']/p/a"));
         creditCardBackButton02.click();
-        MyFunc.Wait(2);
 
-        // 9 (d) If the user has selected the Credit Card or Purchase Order in the "Payment Method",
-        // he/she enters the payment details in the "Payment Information" section
-        // and if it is true clicks the continue button.
-
-        // purchase order
-
-        // negative scenario, PO box is empty
         WebElement purchaseOrder = driver.findElement(By.xpath("//input[@id='paymentmethod_3']"));
         purchaseOrder.click();
-        MyFunc.Wait(2);
 
         WebElement purchaseOrderContinueButton = driver.findElement(By.xpath("//input[@onclick='PaymentMethod.save()']"));
         purchaseOrderContinueButton.click();
-        MyFunc.Wait(2);
 
         WebElement purchaseOrderInfoContinueButton01 = driver.findElement(By.xpath("//input[@onclick='PaymentInfo.save()']"));
         purchaseOrderInfoContinueButton01.click();
-        MyFunc.Wait(2);
 
         WebElement purchaseOrderInfoMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='checkout-confirm-order-load']/div/div[2]/div/div/ul[1]/li[10]")));
-        Assert.assertTrue("Wrong payment method !", purchaseOrderInfoMessage.isDisplayed());
-        MyFunc.Wait(2);
+        Assert.assertTrue(purchaseOrderInfoMessage.isDisplayed(), "Wrong payment method !");
 
         WebElement purchaseOrderBackButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='confirm-order-buttons-container']/p/a")));
         purchaseOrderBackButton.click();
-        MyFunc.Wait(2);
 
-        // positive scenario, PO box is filled up
         WebElement purchaseOrderPOBox = driver.findElement(By.xpath("//input[@id='PurchaseOrderNumber']"));
         purchaseOrderPOBox.sendKeys("123456");
-        MyFunc.Wait(2);
 
         WebElement purchaseOrderInfoContinueButton02 = driver.findElement(By.xpath("//input[@onclick='PaymentInfo.save()']"));
         purchaseOrderInfoContinueButton02.click();
-        MyFunc.Wait(2);
-
-        // 10- The user verifies that the total price of the product is the same as the sub-total.
 
         List<WebElement> prices = driver.findElements(By.xpath("//*[@class='product-subtotal']"));
 
@@ -583,49 +437,32 @@ public class Main extends ChromeDriver {
             System.out.println(p.getText());
             totalPrice = totalPrice + Double.parseDouble(p.getText().replaceAll("[^0-9,.]", ""));
         }
-        System.out.println("totalPrice = " + totalPrice);
 
         WebElement itemTotalelement = driver.findElement(By.xpath("//*[@class='product-price']"));
         Double itemTotal = Double.parseDouble(itemTotalelement.getText().replaceAll("[^0-9,.]", ""));
-        System.out.println("itemTotal = " + itemTotal);
 
-        Assert.assertTrue("Prices are not the same", totalPrice == itemTotal);
-
-        // 11- The user confirms the order after checking the order document's
-        // Billing Address, Shipping Method, Payment Method, Product sections.
+        Assert.assertTrue( totalPrice == itemTotal, "Prices are not the same");
 
         WebElement orderBillingAddresConfirm = driver.findElement(By.xpath("//strong[text()='Billing Address']"));
-        Assert.assertTrue("Billing Address is not seen !",orderBillingAddresConfirm.isDisplayed());
-        MyFunc.Wait(2);
+        Assert.assertTrue(orderBillingAddresConfirm.isDisplayed(), "Billing Address is not seen !");
 
         WebElement orderShippingMethodConfirm = driver.findElement(By.xpath("//strong[text()='Shipping Method']"));
-        Assert.assertTrue("Shipping Method is not seen !",orderShippingMethodConfirm.isDisplayed());
-        MyFunc.Wait(2);
+        Assert.assertTrue(orderShippingMethodConfirm.isDisplayed(), "Shipping Method is not seen !");
 
         WebElement orderPaymentMethodConfirm = driver.findElement(By.xpath("//strong[text()='Payment Method']"));
-        Assert.assertTrue("Shipping Method is not seen !",orderPaymentMethodConfirm.isDisplayed());
-        MyFunc.Wait(2);
+        Assert.assertTrue(orderPaymentMethodConfirm.isDisplayed(), "Shipping Method is not seen !");
 
         WebElement orderProductConfirm = driver.findElement(By.xpath("//div[@id=\"checkout-confirm-order-load\"]//td[2]/a"));
-        Assert.assertTrue("Shipping Method is not seen !",orderProductConfirm.isDisplayed());
-        MyFunc.Wait(2);
+        Assert.assertTrue(orderProductConfirm.isDisplayed(), "Shipping Method is not seen !");
 
         WebElement confirmOrderSaveButton = driver.findElement(By.xpath("//input[@onclick='ConfirmOrder.save()']"));
         confirmOrderSaveButton.click();
-        MyFunc.Wait(2);
-
-        // 12- The user confirms that the order is successfully completed
-        // by seeing the "Your Order Has Been SuccessFully Processed!"message.
 
         WebElement orderConfirmation = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//strong[text()='Your order has been successfully processed!']")));
-        Assert.assertTrue("", orderConfirmation.isDisplayed());
-        MyFunc.Wait(2);
+        Assert.assertTrue(orderConfirmation.isDisplayed());
 
         WebElement setLocationButton = driver.findElement(By.xpath("//div[@class='buttons']/input"));
         setLocationButton.click();
-        MyFunc.Wait(2);
-
-
     }
 
     @Test(priority = 11)
