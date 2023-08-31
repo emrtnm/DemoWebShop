@@ -257,8 +257,13 @@ public class Main extends ChromeDriver {
         WebElement notebook = driver.findElement(By.linkText("Notebooks"));
         notebook.click();
 
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[type='button'][class='button-2 product-box-add-to-cart-button']")));
         WebElement addToCardButton = driver.findElement(By.cssSelector("[type='button'][class='button-2 product-box-add-to-cart-button']"));
         addToCardButton.click();
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='Shopping cart']")));
+
 
         WebElement EmptyshoppingCard = driver.findElement(By.xpath("//span[text()='Shopping cart']"));
         EmptyshoppingCard.click();
@@ -368,7 +373,30 @@ public class Main extends ChromeDriver {
         driver.findElement(By.name("termsofservice")).click();
         driver.findElement(By.xpath("//button[@id='checkout']")).click();
 
-        WebElement newA = wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("billing_address_id")));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='Email']")));
+        WebElement email = driver.findElement(By.xpath("//*[@id='Email']"));
+        email.clear();
+        email.sendKeys(UserData.email);
+
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='Password']")));
+        WebElement password = driver.findElement(By.xpath("//*[@id='Password']"));
+        password.clear();
+        password.sendKeys(UserData.password);
+
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@class='button-1 login-button']")));
+        WebElement login1 = driver.findElement(By.xpath("//input[@class='button-1 login-button']"));
+        login1.click();
+
+        driver.findElement(By.name("termsofservice")).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@id='checkout']")));
+        driver.findElement(By.xpath("//button[@id='checkout']")).click();
+
+
+
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id='billing-address-select']")));
+
+        WebElement newA =driver.findElement(By.xpath("//select[@id='billing-address-select']"));
         Select sel = new Select(newA);
         sel.selectByVisibleText("New Address");
 
@@ -378,11 +406,12 @@ public class Main extends ChromeDriver {
         Select sel1 = new Select(counties);
         sel1.selectByVisibleText("United States");
 
-        Thread.sleep(1000);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("BillingNewAddress.StateProvinceId")));
 
         WebElement AFA = driver.findElement(By.name("BillingNewAddress.StateProvinceId"));
         Select sel2 = new Select(AFA);
-        sel2.selectByVisibleText("California");
+        sel2.selectByIndex(10);
+        //BillingNewAddress.StateProvinceId
 
         driver.findElement(By.id("BillingNewAddress_City")).sendKeys("Istanbul");
         driver.findElement(By.id("BillingNewAddress_Address1")).sendKeys("Istanbul/Turkey");
@@ -390,13 +419,16 @@ public class Main extends ChromeDriver {
         driver.findElement(By.id("BillingNewAddress_ZipPostalCode")).sendKeys("001232");
         driver.findElement(By.id("BillingNewAddress_PhoneNumber")).sendKeys("03124564323");
         driver.findElement(By.id("BillingNewAddress_FaxNumber")).sendKeys("123456");
-        driver.findElement(By.xpath("(//input[@title='Continue'])[1]")).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//input[@title='Continue'])[1]"))).click();
 
-        driver.findElement(By.xpath("(//input[@title='Continue'])[2]")).click();
-        driver.findElement(By.xpath("//input[@onclick='ShippingMethod.save()']")).click();
-        driver.findElement(By.xpath("//input[@onclick='PaymentMethod.save()']")).click();
-        driver.findElement(By.xpath("//input[@onclick='PaymentInfo.save()']")).click();
-        driver.findElement(By.xpath("//input[@onclick='ConfirmOrder.save()']")).click();
+
+        //driver.findElement(By.xpath("(//input[@title='Continue'])[2]")).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//input[@title='Continue'])[2]"))).click();
+       wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@onclick='ShippingMethod.save()']"))).click();
+       wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@onclick='PaymentMethod.save()']"))).click();
+       wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@onclick='PaymentInfo.save()']"))).click();
+       wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@onclick='ConfirmOrder.save()']"))).click();
+
 
         wait.until(ExpectedConditions.textToBe(By.xpath("//div[@class='title']"), "Your order has been successfully processed!"));
 
@@ -409,7 +441,8 @@ public class Main extends ChromeDriver {
         driver.navigate().to("https://demowebshop.tricentis.com/");
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div//ul[@class='top-menu']//li/a[@href='/computers']")));
 
-        actions.moveToElement(computers).build().perform();
+        computers = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div//ul[@class='top-menu']//li/a[@href='/computers']")));
+        new Actions(driver).moveToElement(computers).build().perform();
         wait.until(ExpectedConditions.elementToBeClickable(By.linkText("Notebooks")));
         driver.findElement(By.linkText("Notebooks")).click();
 
@@ -426,38 +459,49 @@ public class Main extends ChromeDriver {
         driver.findElement(By.xpath("//button[@id='checkout']")).click();
 
         WebElement newAD = driver.findElement(By.name("billing_address_id"));
-        new Select(newAD).selectByValue("3220970");
+        new Select(newAD).selectByValue("3225356");
 
-        driver.findElement(By.cssSelector("[onclick='Billing.save()']")).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[onclick='Billing.save()']"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.name("PickUpInStore"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[onclick='Shipping.save()']"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("paymentmethod_1"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[onclick='PaymentMethod.save()']"))).click();
 
-        driver.findElement(By.name("PickUpInStore")).click();
-        driver.findElement(By.cssSelector("[onclick='Shipping.save()']")).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("tr>td> :nth-child(1)"))).click();
 
-        driver.findElement(By.id("paymentmethod_1")).click();
-        driver.findElement(By.cssSelector("[onclick='PaymentMethod.save()']")).click();
+
 
         String text1 = driver.findElement(By.cssSelector("tr>td> :nth-child(1)")).getText();
 
         Assert.assertTrue(text1.contains("Check or money"));
 
-        driver.findElement(By.xpath("(//a[@onclick='Checkout.back(); return false;'])[4]")).click();
-        driver.findElement(By.id("paymentmethod_2")).click();
-        driver.findElement(By.cssSelector("[onclick='PaymentMethod.save()']")).click();
-        driver.findElement(By.xpath("(//a[@onclick='Checkout.back(); return false;'])[4]")).click();
 
-        driver.findElement(By.id("paymentmethod_3")).click();
-        driver.findElement(By.cssSelector("[onclick='PaymentMethod.save()']")).click();
 
-        driver.findElement(By.id("PurchaseOrderNumber")).sendKeys("");
-        driver.findElement(By.cssSelector("[onclick='PaymentInfo.save()']")).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//a[@onclick='Checkout.back(); return false;'])[4]"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("paymentmethod_2"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[onclick='PaymentMethod.save()']"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("paymentmethod_3"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.name("CardholderName"))).sendKeys("visabank");
+        wait.until(ExpectedConditions.elementToBeClickable(By.name("CardNumber"))).sendKeys("1111 2222 3333 4444");
+        wait.until(ExpectedConditions.elementToBeClickable(By.name("CardCode"))).sendKeys("111");
 
-        String confirm = driver.findElement(By.xpath("(//span[@class='number'])[6]")).getText();
 
-        Assert.assertEquals(confirm, "6", "it couldn't go to the next page");
+        //CardholderName
+        //ConfirmOrder.save()
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[onclick='PaymentInfo.save()']"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[onclick='ConfirmOrder.save()"))).click();
+
+
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='title']")));
+
+        String confirm = driver.findElement(By.xpath("//div[@class='title']")).getText();
+
+        Assert.assertEquals(confirm, "Your order has been successfully processed!");
     }
 
-   @AfterClass
-   public void driverQuit() {
-       driver.quit();
-   }
+  // @AfterClass
+   //public void driverQuit() {
+     //  driver.quit();
+  // }
 }
