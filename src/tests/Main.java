@@ -179,54 +179,55 @@ public class Main extends ChromeDriver {
     }
 
     @Test(priority = 7)
-    public void US6Ordering() throws AWTException {
+    public void US6Ordering() throws InterruptedException, AWTException {
         driver.navigate().to("https://demowebshop.tricentis.com/");
 
-        WebElement loginLink = driver.findElement(By.xpath("//a[text()='Log in']"));
-        loginLink.click();
+        // 1- The user selects "14.1-inch Laptop" product from the product list on the homepage
+        // by clicking its image or its link under the image.
 
-        WebElement email    = driver.findElement(By.id("Email"));
-        WebElement password = driver.findElement(By.id("Password"));
-        WebElement loginBtn = driver.findElement(By.cssSelector("input[type='submit'][value='Log in']"));
-
-        email.sendKeys(UserData.email);
-        password.sendKeys(UserData.password);
-        loginBtn.click();
-
-        WebElement productSelection01 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div[4]/div[1]/div[4]/div[3]/div/div/div[3]/div[3]/div/div[1]/a/img")));
+        // clicking its image.
+        WebElement productSelection01 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div[4]/div[1]/div[4]/div[3]/div/div/div[3]/div[3]/div/div[1]/a/img")));//(//img[@alt='Picture of 14.1-inch Laptop'])[1]
         productSelection01.click();
 
-        WebElement productMessage01 = driver.findElement(By.xpath("//h1[@itemprop='name']"));
+        WebElement productMessage01 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//h1[@itemprop='name']")));
         Assert.assertTrue(productMessage01.getText().contains("14.1-inch Laptop"), "The product is not '14.1-inch Laptop'");
 
+        // clicking its link under the image.
         driver.navigate().back();
 
-        WebElement productSelection02 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//a[text()='14.1-inch Laptop'])[1]")));
+        WebElement productSelection02 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("14.1-inch Laptop")));
         productSelection02.click();
 
-        WebElement productMessage02 = driver.findElement(By.xpath("//h1[@itemprop='name']"));
+        WebElement productMessage02 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//h1[@itemprop='name']")));
         Assert.assertTrue(productMessage02.getText().contains("14.1-inch Laptop"), "The product is not '14.1-inch Laptop'");
 
-        WebElement addToCartButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='add-to-cart-button-31']")));
+        // 2- The user adds the product to the shopping cart by clicking the "Add To Cart" button
+        // and confirm the selected product is added into the shopping cart.
+
+        WebElement addToCartButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id=\"add-to-cart-button-31\"]")));
         addToCartButton.click();
 
         WebElement addToCartMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//p[text()='The product has been added to your ']")));
         Assert.assertTrue(addToCartMessage.isDisplayed(), "Product has not been added to shopping cart");
 
-        driver.findElement(By.xpath("//span[text()='Shopping cart']")).click();
+        // 3- The user goes to the shopping cart and selects the appropriate option by clicking
+        // "Country" dropbox  "State/province" dropbox and "Zip/postal code" textbox for cargo information.
 
-        driver.findElement(By.xpath("//input[@name='estimateshipping']")).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='Shopping cart']"))).click();
+
+        // positive scenario, avaliable address is used for the dropboxes and textbox.
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='estimateshipping']"))).click();
 
         WebElement firstShippingMessage01 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//li[@class='shipping-option-item']/strong)[1]")));
         Assert.assertTrue(firstShippingMessage01.getText().contains("Ground"), "Shipping message is not seen");
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("CountryId")));
-        WebElement countryDropbox = driver.findElement(By.id("CountryId"));
-        new Select(countryDropbox).selectByVisibleText("United States");
+        // negative scenario, when the country, state and zip/postal code boxes are changed.
+        WebElement countryDropbox = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id='CountryId']")));
+        new Select(countryDropbox).selectByIndex(1);
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("StateProvinceId")));
-        WebElement stateDropbox = driver.findElement(By.id("StateProvinceId"));
-        new Select(stateDropbox).selectByVisibleText("Arizona");
+        Thread.sleep(1000);
+        WebElement stateDropbox = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id='StateProvinceId']")));
+        new Select(stateDropbox).selectByIndex(6);
 
         new Robot().keyPress(KeyEvent.VK_TAB);
         new Robot().keyRelease(KeyEvent.VK_TAB);
@@ -237,66 +238,85 @@ public class Main extends ChromeDriver {
         WebElement zipPostalCode = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='ZipPostalCode']")));
         zipPostalCode.sendKeys("85004-1558");
 
+        // 4- The user clicks estimate shipping button to see the estimated delivery time of product
+
         driver.findElement(By.xpath("//input[@name='estimateshipping']")).click();
 
         WebElement firstShippingMessage02 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//li[@class='shipping-option-item']/strong)[1]")));
         Assert.assertTrue(firstShippingMessage02.getText().contains("Ground"), "Shipping message is not seen");
 
-        WebElement checkout = driver.findElement(By.xpath("//button[@id='checkout']"));
+        // 5- The user marks the "agree" confirmation box to accept conditions.
+
+        // negative scenario, the user clicks checkout button without marking the "agree" confirmation box.
+        WebElement checkout = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@id='checkout']")));
         checkout.click();
 
-        WebElement termsOfServiceMessage = driver.findElement(By.xpath("//button[@role='button']"));
+        WebElement termsOfServiceMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@role='button']")));
         termsOfServiceMessage.click();
 
-        driver.findElement(By.xpath("//input[@id='termsofservice']")).click();
+        // positive scenario, "agree" confirmation box is marked.
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='termsofservice']"))).click();
+
+        // 6- The user starts payment by clicking the "Checkout" button.
+
         checkout.click();
 
-        WebElement billingAddressDropbox = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id='billing-address-select']")));
-        new Select(billingAddressDropbox).selectByIndex(0);
+        // 7- The user enters a new address and clicks the continue button.
 
-        WebElement billingSaveContinueButton01 = driver.findElement(By.xpath("//input[@onclick='Billing.save()']"));
+        WebElement billingSaveContinueButton01 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@onclick='Billing.save()']")));
         billingSaveContinueButton01.click();
 
-        WebElement shippingBackButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@id='shipping-buttons-container']/p/a")));
-        shippingBackButton.click();
+        // enters a new address
 
-        new Select(billingAddressDropbox).selectByIndex(1);
+        // negative scenario, all necessary fields are empty.
+        WebElement billingAddressDropbox = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id='BillingNewAddress_CountryId']")));
+        new Select(billingAddressDropbox).selectByIndex(0);
 
-        WebElement billingSaveContinueButton02 = driver.findElement(By.xpath("//input[@onclick='Billing.save()']"));
+        WebElement billingSaveContinueButton02 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@onclick='Billing.save()']")));
         billingSaveContinueButton02.click();
 
-        WebElement oneOfNecessaryAddressElements = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='Country is required.']")));
+        WebElement oneOfNecessaryAddressElements = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='billing-new-address-form']/div/div/div/div[5]/span[2]")));
         Assert.assertTrue(oneOfNecessaryAddressElements.isDisplayed(), "Required field is entered !");
 
+        // positive scenario, all necessary fields are filled up.
         WebElement billingNewAddressCountryDropbox = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id='BillingNewAddress_CountryId']")));
         new Select(billingNewAddressCountryDropbox).selectByIndex(1);// United States
+        Thread.sleep(1000);
 
         WebElement billingNewAddressStateDropbox = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id='BillingNewAddress_StateProvinceId']")));
         new Select(billingNewAddressStateDropbox).selectByIndex(6);// Arizona
 
-        WebElement billingNewAddressCity = driver.findElement(By.xpath("//input[@id='BillingNewAddress_City']"));
+        //103 E PALM LN PHOENIX AZ 85004-1558 USA
+        WebElement billingNewAddressCity = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='BillingNewAddress_City']")));
         billingNewAddressCity.sendKeys("Phoenix");
 
-        WebElement billingNewAddress1 = driver.findElement(By.xpath("//input[@id='BillingNewAddress_Address1']"));
+        WebElement billingNewAddress1 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='BillingNewAddress_Address1']")));
         billingNewAddress1.sendKeys("103 E PALM LN");
 
-        WebElement billingNewAddressZip = driver.findElement(By.xpath("//input[@id='BillingNewAddress_ZipPostalCode']"));
+        WebElement billingNewAddressZip = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='BillingNewAddress_ZipPostalCode']")));
         billingNewAddressZip.sendKeys("85004-1558");
 
-        WebElement billingNewAddressPhoneNumber = driver.findElement(By.xpath("//input[@id='BillingNewAddress_PhoneNumber']"));
+        WebElement billingNewAddressPhoneNumber = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='BillingNewAddress_PhoneNumber']")));
         billingNewAddressPhoneNumber.sendKeys("(520)-520-1234");
 
-        WebElement billingSaveContinueButton03 = driver.findElement(By.xpath("//input[@onclick='Billing.save()']"));
+        WebElement billingSaveContinueButton03 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@onclick='Billing.save()']")));
         billingSaveContinueButton03.click();
 
-        WebElement shippingSaveContinueButton02 = driver.findElement(By.xpath("//input[@onclick='Shipping.save()']"));
+        // 8- When the user selects the "In-Store Pickup" option,
+        // verifies that the shipping address is lost.
+        // Then the user clicks the continue button.
+
+        // negative scenario, In-Store Pickup" option is not selected
+        WebElement shippingSaveContinueButton02 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@onclick='Shipping.save()']")));
         shippingSaveContinueButton02.click();
 
-        driver.findElement(By.xpath("//input[@id='shippingoption_0']//following::label")).click();
-        driver.findElement(By.xpath("//input[@id='shippingoption_1']//following::label")).click();
-        driver.findElement(By.xpath("//input[@id='shippingoption_2']//following::label")).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='shippingoption_0']//following::label"))).click();
 
-        WebElement shippingMethodSaveContinueButton = driver.findElement(By.xpath("//input[@onclick='ShippingMethod.save()']"));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='shippingoption_1']//following::label"))).click();
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='shippingoption_2']//following::label"))).click();
+
+        WebElement shippingMethodSaveContinueButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@onclick='ShippingMethod.save()']")));
         shippingMethodSaveContinueButton.click();
 
         WebElement paymentMethodBackButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@id='payment-method-buttons-container']/p/a")));
@@ -305,18 +325,31 @@ public class Main extends ChromeDriver {
         WebElement shippingMethodBackButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@id='shipping-method-buttons-container']/p/a")));
         shippingMethodBackButton.click();
 
-        driver.findElement(By.xpath("//input[@id='PickUpInStore']")).click();
-        
-        WebElement shippingAddressSelectMessage = driver.findElement(By.xpath("//label[text()='Select a shipping address from your address book or enter a new address.']"));
-        Assert.assertFalse(shippingAddressSelectMessage.isDisplayed(), "Address message is still displayed");
+        //positive scenario
+        WebElement shippingAddressSelectMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//label[text()='Select a shipping address from your address book or enter a new address.']")));
 
-        WebElement shippingSaveContinueButton01 = driver.findElement(By.xpath("//input[@onclick='Shipping.save()']"));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='PickUpInStore']"))).click();
+
+        Assert.assertFalse(shippingAddressSelectMessage.isDisplayed(), "Address message is still displayed");
+        Thread.sleep(1000);
+        WebElement shippingSaveContinueButton01 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@onclick='Shipping.save()']")));
         shippingSaveContinueButton01.click();
 
-        WebElement cashOnDelivery = driver.findElement(By.xpath("//input[@id='paymentmethod_0']"));
+        // 9- The user chooses the payment method (Cash on,Check/MoneyOrder,Credit Card, Purchase Order )
+        // and clicks the continue button.
+        // If the user has selected the Cash on or Check/MoneyOrder payment method
+        // verifies the payment information message of selected payment method
+        // or enters necessary payment  information into the textboxes
+
+        // 9 (a)- If the user has selected the Cash on or Check/MoneyOrder
+        // he/she verifies the payment method by checking message occuring in the "Payment Information" section
+        // and if it is true clicks the continue button.
+
+        // cash on delivery
+        WebElement cashOnDelivery = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='paymentmethod_0']")));
         cashOnDelivery.click();
 
-        WebElement cashOnDeliveryContinueButton = driver.findElement(By.xpath("//input[@onclick='PaymentMethod.save()']"));
+        WebElement cashOnDeliveryContinueButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@onclick='PaymentMethod.save()']")));
         cashOnDeliveryContinueButton.click();
 
         WebElement cashOnDeliveryMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@id='checkout-payment-info-load']//p")));
@@ -325,31 +358,43 @@ public class Main extends ChromeDriver {
         WebElement cashOnDeliveryBackButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@id='payment-info-buttons-container']/p/a")));
         cashOnDeliveryBackButton.click();
 
-        WebElement checkMoneyOrder = driver.findElement(By.xpath("//input[@id='paymentmethod_1']"));
+        // 9 (b)- If the user has selected the Cash on or Check/MoneyOrder
+        // he/she verifies the payment method  by checking message occuring in the "Payment Information" section
+        // and if it is true clicks the continue button.
+
+        // check / money order
+        WebElement checkMoneyOrder = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='paymentmethod_1']")));
         checkMoneyOrder.click();
 
-        WebElement checkMoneyOrderContinueButton = driver.findElement(By.xpath("//input[@onclick='PaymentMethod.save()']"));
+        WebElement checkMoneyOrderContinueButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@onclick='PaymentMethod.save()']")));
         checkMoneyOrderContinueButton.click();
 
         WebElement checkMoneyOrderMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//b[text()='Tricentis GmbH']")));
         Assert.assertTrue(checkMoneyOrderMessage.isDisplayed(), "Check / Money order has not been completed !");
 
-        WebElement checkMoneyOrderBackButton = driver.findElement(By.xpath("//div[@id='payment-info-buttons-container']/p/a"));
+        WebElement checkMoneyOrderBackButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@id='payment-info-buttons-container']/p/a")));
         checkMoneyOrderBackButton.click();
 
-        WebElement creditCard = driver.findElement(By.xpath("//input[@id='paymentmethod_2']"));
+        // 9 (c) If the user has selected the Credit Card or Purchase Order in the "Payment Method",
+        // he/she enters the payment details in the "Payment Information" section
+        // and if it is true clicks the continue button.
+
+        // credit card
+        // negative scenario 01, credit card fields are empty
+        WebElement creditCard = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='paymentmethod_2']")));
         creditCard.click();
 
-        WebElement creditCardContinueButton01 = driver.findElement(By.xpath("//input[@onclick='PaymentMethod.save()']"));
+        WebElement creditCardContinueButton01 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@onclick='PaymentMethod.save()']")));
         creditCardContinueButton01.click();
 
-        WebElement creditCardInfoContinueButton01 = driver.findElement(By.xpath("//input[@onclick='PaymentInfo.save()']"));
+        WebElement creditCardInfoContinueButton01 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@onclick='PaymentInfo.save()']")));
         creditCardInfoContinueButton01.click();
 
         WebElement creditCardInfoMessage01 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//li[text()='Wrong card number']")));
         Assert.assertTrue(creditCardInfoMessage01.isDisplayed(), "Right card Number !");
 
-        WebElement creditCardHolderName01 = driver.findElement(By.xpath("//input[@id='CardholderName']"));
+        // negative scenario 02, credit card fields are filled up except cardholder name
+        WebElement creditCardHolderName01 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='CardholderName']")));
         creditCardHolderName01.sendKeys("Ali Cabbar");
 
         creditCardInfoContinueButton01.click();
@@ -357,7 +402,8 @@ public class Main extends ChromeDriver {
         WebElement creditCardInfoMessageCardHolderName = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='checkout-payment-info-load']/div/div/div[2]/div/ul/li[1]")));
         Assert.assertTrue(creditCardInfoMessageCardHolderName.isDisplayed(), "Card holder name has been entered !");
 
-        WebElement creditCardNumber01 = driver.findElement(By.xpath("//input[@id='CardNumber']"));
+        // negative scenario 03, credit card fields are filled up except credit card number
+        WebElement creditCardNumber01 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='CardNumber']")));
         creditCardNumber01.sendKeys("5555 5555 5555 5555");
 
         creditCardInfoContinueButton01.click();
@@ -365,57 +411,73 @@ public class Main extends ChromeDriver {
         WebElement creditCardInfoMessageCardNumber = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='checkout-payment-info-load']/div/div/div[2]/div/ul/li[1]")));
         Assert.assertTrue(creditCardInfoMessageCardNumber.isDisplayed(), "Right card number !");
 
-        WebElement creditCardCode01 = driver.findElement(By.xpath("//input[@id='CardCode']"));
+        // negative scenario 04, credit card fields are filled up except credit card code
+        Thread.sleep(1000);
+        WebElement creditCardCode01 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='CardCode']")));
         creditCardCode01.sendKeys("555");
+
         creditCardInfoContinueButton01.click();
 
         WebElement creditCardInfoMessageCardCode = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='checkout-payment-info-load']/div/div/div[2]/div/ul/li")));
         Assert.assertTrue(creditCardInfoMessageCardCode.isDisplayed(), "Right card code !");
+        Thread.sleep(1000);
 
-        WebElement creditCardBackButton = driver.findElement(By.xpath("//div[@id='payment-info-buttons-container']/p/a"));
+        WebElement creditCardBackButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@id='payment-info-buttons-container']/p/a")));
         creditCardBackButton.click();
 
-        WebElement creditCardContinueButton02 = driver.findElement(By.xpath("//input[@onclick='PaymentMethod.save()']"));
+        // positive scenario, all credit card fields are filled up
+
+        WebElement creditCardContinueButton02 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@onclick='PaymentMethod.save()']")));
         creditCardContinueButton02.click();
 
-        WebElement creditCardTypeDropBox = driver.findElement(By.xpath("//select[@id='CreditCardType']"));
+        WebElement creditCardTypeDropBox = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id='CreditCardType']")));
 
         new Select(creditCardTypeDropBox).selectByIndex(1);
+
         new Select(creditCardTypeDropBox).selectByIndex(2);
+
         new Select(creditCardTypeDropBox).selectByIndex(3);
+
         new Select(creditCardTypeDropBox).selectByIndex(0);
 
-        WebElement creditCardHolderName02 = driver.findElement(By.xpath("//input[@id='CardholderName']"));
+        WebElement creditCardHolderName02 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='CardholderName']")));
         creditCardHolderName02.sendKeys("Ali Cabbar");
 
-        WebElement creditCardNumber02 = driver.findElement(By.xpath("//input[@id='CardNumber']"));
+        WebElement creditCardNumber02 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='CardNumber']")));
         creditCardNumber02.sendKeys("5555 5555 5555 5555");
 
-        WebElement creditCardExpirationDateMonthDropBox = driver.findElement(By.xpath("//select[@id='ExpireMonth']"));
+        WebElement creditCardExpirationDateMonthDropBox = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id='ExpireMonth']")));
         new Select(creditCardExpirationDateMonthDropBox).selectByIndex(1);
 
-        WebElement creditCardExpirationDateYearDropBox = driver.findElement(By.xpath("//select[@id='ExpireYear']"));
+        WebElement creditCardExpirationDateYearDropBox = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id='ExpireYear']")));
         new Select(creditCardExpirationDateYearDropBox).selectByIndex(1);
 
-        WebElement creditCardCode02 = driver.findElement(By.xpath("//input[@id='CardCode']"));
+        WebElement creditCardCode02 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='CardCode']")));
         creditCardCode02.sendKeys("555");
 
-        WebElement creditCardInfoContinueButton02 = driver.findElement(By.xpath("//input[@onclick='PaymentInfo.save()']"));
+        WebElement creditCardInfoContinueButton02 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@onclick='PaymentInfo.save()']")));
         creditCardInfoContinueButton02.click();
 
         WebElement creditCardInfoMessage02 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//li[text()='Wrong card number']")));
         Assert.assertTrue(creditCardInfoMessage02.isDisplayed(), "Right card Number !");
 
-        WebElement creditCardBackButton02 = driver.findElement(By.xpath("//div[@id='payment-info-buttons-container']/p/a"));
+        WebElement creditCardBackButton02 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@id='payment-info-buttons-container']/p/a")));
         creditCardBackButton02.click();
 
-        WebElement purchaseOrder = driver.findElement(By.xpath("//input[@id='paymentmethod_3']"));
+        // 9 (d) If the user has selected the Credit Card or Purchase Order in the "Payment Method",
+        // he/she enters the payment details in the "Payment Information" section
+        // and if it is true clicks the continue button.
+
+        // purchase order
+
+        // negative scenario, PO box is empty
+        WebElement purchaseOrder = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='paymentmethod_3']")));
         purchaseOrder.click();
 
-        WebElement purchaseOrderContinueButton = driver.findElement(By.xpath("//input[@onclick='PaymentMethod.save()']"));
+        WebElement purchaseOrderContinueButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@onclick='PaymentMethod.save()']")));
         purchaseOrderContinueButton.click();
 
-        WebElement purchaseOrderInfoContinueButton01 = driver.findElement(By.xpath("//input[@onclick='PaymentInfo.save()']"));
+        WebElement purchaseOrderInfoContinueButton01 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@onclick='PaymentInfo.save()']")));
         purchaseOrderInfoContinueButton01.click();
 
         WebElement purchaseOrderInfoMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='checkout-confirm-order-load']/div/div[2]/div/div/ul[1]/li[10]")));
@@ -424,53 +486,59 @@ public class Main extends ChromeDriver {
         WebElement purchaseOrderBackButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='confirm-order-buttons-container']/p/a")));
         purchaseOrderBackButton.click();
 
-        WebElement purchaseOrderPOBox = driver.findElement(By.xpath("//input[@id='PurchaseOrderNumber']"));
+        // positive scenario, PO box is filled up
+        WebElement purchaseOrderPOBox = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@id='PurchaseOrderNumber']")));
         purchaseOrderPOBox.sendKeys("123456");
 
-        WebElement purchaseOrderInfoContinueButton02 = driver.findElement(By.xpath("//input[@onclick='PaymentInfo.save()']"));
+        WebElement purchaseOrderInfoContinueButton02 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@onclick='PaymentInfo.save()']")));
         purchaseOrderInfoContinueButton02.click();
+        Thread.sleep(2000);
+        // 10- The user verifies that the total price of the product is the same as the sub-total.
 
         List<WebElement> prices = driver.findElements(By.xpath("//*[@class='product-subtotal']"));
 
         double totalPrice = 0;
         for (WebElement p : prices) {
-            System.out.println(p.getText());
             totalPrice = totalPrice + Double.parseDouble(p.getText().replaceAll("[^0-9,.]", ""));
         }
 
         WebElement itemTotalelement = driver.findElement(By.xpath("//*[@class='product-price']"));
         Double itemTotal = Double.parseDouble(itemTotalelement.getText().replaceAll("[^0-9,.]", ""));
 
-        Assert.assertTrue( totalPrice == itemTotal, "Prices are not the same");
+        Assert.assertTrue(totalPrice == itemTotal, "Prices are not the same");
 
-        WebElement orderBillingAddresConfirm = driver.findElement(By.xpath("//strong[text()='Billing Address']"));
+        // 11- The user confirms the order after checking the order document's
+        // Billing Address, Shipping Method, Payment Method, Product sections.
+
+        WebElement orderBillingAddresConfirm = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//strong[text()='Billing Address']")));
         Assert.assertTrue(orderBillingAddresConfirm.isDisplayed(), "Billing Address is not seen !");
 
-        WebElement orderShippingMethodConfirm = driver.findElement(By.xpath("//strong[text()='Shipping Method']"));
+        WebElement orderShippingMethodConfirm = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//strong[text()='Shipping Method']")));
         Assert.assertTrue(orderShippingMethodConfirm.isDisplayed(), "Shipping Method is not seen !");
 
-        WebElement orderPaymentMethodConfirm = driver.findElement(By.xpath("//strong[text()='Payment Method']"));
-        Assert.assertTrue(orderPaymentMethodConfirm.isDisplayed(), "Shipping Method is not seen !");
+        WebElement orderPaymentMethodConfirm = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//strong[text()='Payment Method']")));
+        Assert.assertTrue(orderPaymentMethodConfirm.isDisplayed(),"Shipping Method is not seen !");
 
-        WebElement orderProductConfirm = driver.findElement(By.xpath("//div[@id=\"checkout-confirm-order-load\"]//td[2]/a"));
-        Assert.assertTrue(orderProductConfirm.isDisplayed(), "Shipping Method is not seen !");
+        WebElement orderProductConfirm = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@id=\"checkout-confirm-order-load\"]//td[2]/a")));
+        Assert.assertTrue(orderProductConfirm.isDisplayed(),"Shipping Method is not seen !");
 
-        WebElement confirmOrderSaveButton = driver.findElement(By.xpath("//input[@onclick='ConfirmOrder.save()']"));
+        WebElement confirmOrderSaveButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@onclick='ConfirmOrder.save()']")));
         confirmOrderSaveButton.click();
 
-        WebElement orderConfirmation = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//strong[text()='Your order has been successfully processed!']")));
-        Assert.assertTrue(orderConfirmation.isDisplayed());
+        // 12- The user confirms that the order is successfully completed
+        // by seeing the "Your Order Has Been SuccessFully Processed!"message.
 
-        WebElement setLocationButton = driver.findElement(By.xpath("//div[@class='buttons']/input"));
+        WebElement orderConfirmation = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//strong[text()='Your order has been successfully processed!']")));
+        Assert.assertTrue(orderConfirmation.isDisplayed(),"Your order has not been successfully processed!");
+
+        WebElement setLocationButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='buttons']/input")));
         setLocationButton.click();
+
     }
 
     @Test(priority = 11)
     public void US7SurveyResponse() {
         driver.get("https://demowebshop.tricentis.com/");
-
-        WebElement logoutBtn = driver.findElement(By.className("ico-logout"));
-        logoutBtn.click();
 
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//label[contains(text(), 'Excellent')]")));
         WebElement resultsExButton = driver.findElement(By.xpath("//label[contains(text(), 'Excellent')]"));
@@ -528,9 +596,8 @@ public class Main extends ChromeDriver {
     }
 
     @Test(priority = 9)
-    public void US9UseCouponAndGiftCart() {
+    public void US9UseCouponAndGiftCart() throws InterruptedException {
         driver.get("https://demowebshop.tricentis.com/");
-
         JavascriptExecutor js = (JavascriptExecutor) driver;
         Actions actions = new Actions(driver);
 
@@ -541,9 +608,12 @@ public class Main extends ChromeDriver {
         WebElement notebook = driver.findElement(By.linkText("Notebooks"));
         notebook.click();
 
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[type='button'][class='button-2 product-box-add-to-cart-button']")));
         WebElement addToCardButton = driver.findElement(By.cssSelector("[type='button'][class='button-2 product-box-add-to-cart-button']"));
         addToCardButton.click();
 
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='Shopping cart']")));
         WebElement EmptyshoppingCard = driver.findElement(By.xpath("//span[text()='Shopping cart']"));
         EmptyshoppingCard.click();
 
@@ -652,7 +722,7 @@ public class Main extends ChromeDriver {
         driver.findElement(By.name("termsofservice")).click();
         driver.findElement(By.xpath("//button[@id='checkout']")).click();
 
-        WebElement newA = driver.findElement(By.name("billing_address_id"));
+        WebElement newA =driver.findElement(By.xpath("//select[@id='billing-address-select']"));
         Select sel = new Select(newA);
         sel.selectByVisibleText("New Address");
 
@@ -662,9 +732,6 @@ public class Main extends ChromeDriver {
         Select sel1 = new Select(counties);
         sel1.selectByVisibleText("United States");
 
-        WebElement AFA = driver.findElement(By.xpath("//select[@data-val-number='The field State / province must be a number.']"));
-        Select sel2 = new Select(AFA);
-        sel2.selectByVisibleText("California");
 
         driver.findElement(By.id("BillingNewAddress_City")).sendKeys("Istanbul");
         driver.findElement(By.id("BillingNewAddress_Address1")).sendKeys("Istanbul/Turkey");
@@ -672,13 +739,13 @@ public class Main extends ChromeDriver {
         driver.findElement(By.id("BillingNewAddress_ZipPostalCode")).sendKeys("001232");
         driver.findElement(By.id("BillingNewAddress_PhoneNumber")).sendKeys("03124564323");
         driver.findElement(By.id("BillingNewAddress_FaxNumber")).sendKeys("123456");
-        driver.findElement(By.xpath("(//input[@title='Continue'])[1]")).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//input[@title='Continue'])[1]"))).click();
 
-        driver.findElement(By.xpath("(//input[@title='Continue'])[2]")).click();
-        driver.findElement(By.xpath("//input[@onclick='ShippingMethod.save()']")).click();
-        driver.findElement(By.xpath("//input[@onclick='PaymentMethod.save()']")).click();
-        driver.findElement(By.xpath("//input[@onclick='PaymentInfo.save()']")).click();
-        driver.findElement(By.xpath("//input[@onclick='ConfirmOrder.save()']")).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//input[@title='Continue'])[2]"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@onclick='ShippingMethod.save()']"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@onclick='PaymentMethod.save()']"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@onclick='PaymentInfo.save()']"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@onclick='ConfirmOrder.save()']"))).click();
 
         wait.until(ExpectedConditions.textToBe(By.xpath("//div[@class='title']"), "Your order has been successfully processed!"));
 
@@ -691,7 +758,8 @@ public class Main extends ChromeDriver {
         driver.navigate().to("https://demowebshop.tricentis.com/");
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div//ul[@class='top-menu']//li/a[@href='/computers']")));
 
-        actions.moveToElement(computers).build().perform();
+        WebElement computers02 = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div//ul[@class='top-menu']//li/a[@href='/computers']")));
+        new Actions(driver).moveToElement(computers02).build().perform();
         wait.until(ExpectedConditions.elementToBeClickable(By.linkText("Notebooks")));
         driver.findElement(By.linkText("Notebooks")).click();
 
@@ -708,34 +776,35 @@ public class Main extends ChromeDriver {
         driver.findElement(By.xpath("//button[@id='checkout']")).click();
 
         WebElement newAD = driver.findElement(By.name("billing_address_id"));
-        new Select(newAD).selectByValue("3220970");
+        new Select(newAD).selectByIndex(1);
 
-        driver.findElement(By.cssSelector("[onclick='Billing.save()']")).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[onclick='Billing.save()']"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.name("PickUpInStore"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[onclick='Shipping.save()']"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("paymentmethod_1"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[onclick='PaymentMethod.save()']"))).click();
 
-        driver.findElement(By.name("PickUpInStore")).click();
-        driver.findElement(By.cssSelector("[onclick='Shipping.save()']")).click();
-
-        driver.findElement(By.id("paymentmethod_1")).click();
-        driver.findElement(By.cssSelector("[onclick='PaymentMethod.save()']")).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("tr>td> :nth-child(1)"))).click();
 
         String text1 = driver.findElement(By.cssSelector("tr>td> :nth-child(1)")).getText();
 
         Assert.assertTrue(text1.contains("Check or money"));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//a[@onclick='Checkout.back(); return false;'])[4]"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("paymentmethod_3"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[onclick='PaymentMethod.save()']"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//a[@onclick='Checkout.back(); return false;'])[4]"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("paymentmethod_2"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[onclick='PaymentMethod.save()']"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.name("CardholderName"))).sendKeys("visabank");
+        wait.until(ExpectedConditions.elementToBeClickable(By.name("CardNumber"))).sendKeys("1111 2222 3333 4444");
+        wait.until(ExpectedConditions.elementToBeClickable(By.name("CardCode"))).sendKeys("111");
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[onclick='PaymentInfo.save()']"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[onclick='ConfirmOrder.save()"))).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='title']")));
 
-        driver.findElement(By.xpath("(//a[@onclick='Checkout.back(); return false;'])[4]")).click();
-        driver.findElement(By.id("paymentmethod_2")).click();
-        driver.findElement(By.cssSelector("[onclick='PaymentMethod.save()']")).click();
-        driver.findElement(By.xpath("(//a[@onclick='Checkout.back(); return false;'])[4]")).click();
+        String confirm = driver.findElement(By.xpath("//div[@class='title']")).getText();
 
-        driver.findElement(By.id("paymentmethod_3")).click();
-        driver.findElement(By.cssSelector("[onclick='PaymentMethod.save()']")).click();
-
-        driver.findElement(By.id("PurchaseOrderNumber")).sendKeys("");
-        driver.findElement(By.cssSelector("[onclick='PaymentInfo.save()']")).click();
-
-        String confirm = driver.findElement(By.xpath("(//span[@class='number'])[6]")).getText();
-
-        Assert.assertEquals(confirm, "6", "it couldn't go to the next page");
+        Assert.assertEquals(confirm, "Your order has been successfully processed!");
     }
 
    @AfterClass
