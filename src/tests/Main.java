@@ -244,7 +244,7 @@ public class Main extends ChromeDriver {
     }
 
     @Test(priority = 9)
-    public void US9UseCouponAndGiftCart() throws InterruptedException {
+    public void US9UseCouponAndGiftCart()  {
         driver.get("https://demowebshop.tricentis.com/");
 
         JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -406,12 +406,6 @@ public class Main extends ChromeDriver {
         Select sel1 = new Select(counties);
         sel1.selectByVisibleText("United States");
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("BillingNewAddress.StateProvinceId")));
-
-        WebElement AFA = driver.findElement(By.name("BillingNewAddress.StateProvinceId"));
-        Select sel2 = new Select(AFA);
-        sel2.selectByIndex(10);
-        //BillingNewAddress.StateProvinceId
 
         driver.findElement(By.id("BillingNewAddress_City")).sendKeys("Istanbul");
         driver.findElement(By.id("BillingNewAddress_Address1")).sendKeys("Istanbul/Turkey");
@@ -469,14 +463,9 @@ public class Main extends ChromeDriver {
 
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("tr>td> :nth-child(1)"))).click();
 
-
-
         String text1 = driver.findElement(By.cssSelector("tr>td> :nth-child(1)")).getText();
 
         Assert.assertTrue(text1.contains("Check or money"));
-
-
-
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//a[@onclick='Checkout.back(); return false;'])[4]"))).click();
         wait.until(ExpectedConditions.elementToBeClickable(By.id("paymentmethod_2"))).click();
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[onclick='PaymentMethod.save()']"))).click();
@@ -485,9 +474,6 @@ public class Main extends ChromeDriver {
         wait.until(ExpectedConditions.elementToBeClickable(By.name("CardNumber"))).sendKeys("1111 2222 3333 4444");
         wait.until(ExpectedConditions.elementToBeClickable(By.name("CardCode"))).sendKeys("111");
 
-
-        //CardholderName
-        //ConfirmOrder.save()
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[onclick='PaymentInfo.save()']"))).click();
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[onclick='ConfirmOrder.save()"))).click();
 
@@ -500,8 +486,8 @@ public class Main extends ChromeDriver {
         Assert.assertEquals(confirm, "Your order has been successfully processed!");
     }
 
-  // @AfterClass
-   //public void driverQuit() {
-     //  driver.quit();
-  // }
+  @AfterClass
+   public void driverQuit() {
+     driver.quit();
+   }
 }
