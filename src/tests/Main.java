@@ -246,7 +246,6 @@ public class Main extends ChromeDriver {
     @Test(priority = 9)
     public void US9UseCouponAndGiftCart()  {
         driver.get("https://demowebshop.tricentis.com/");
-
         JavascriptExecutor js = (JavascriptExecutor) driver;
         Actions actions = new Actions(driver);
 
@@ -263,8 +262,6 @@ public class Main extends ChromeDriver {
         addToCardButton.click();
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text()='Shopping cart']")));
-
-
         WebElement EmptyshoppingCard = driver.findElement(By.xpath("//span[text()='Shopping cart']"));
         EmptyshoppingCard.click();
 
@@ -391,9 +388,6 @@ public class Main extends ChromeDriver {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@id='checkout']")));
         driver.findElement(By.xpath("//button[@id='checkout']")).click();
 
-
-
-
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id='billing-address-select']")));
 
         WebElement newA =driver.findElement(By.xpath("//select[@id='billing-address-select']"));
@@ -415,8 +409,6 @@ public class Main extends ChromeDriver {
         driver.findElement(By.id("BillingNewAddress_FaxNumber")).sendKeys("123456");
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//input[@title='Continue'])[1]"))).click();
 
-
-        //driver.findElement(By.xpath("(//input[@title='Continue'])[2]")).click();
         wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//input[@title='Continue'])[2]"))).click();
        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@onclick='ShippingMethod.save()']"))).click();
        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@onclick='PaymentMethod.save()']"))).click();
@@ -476,9 +468,6 @@ public class Main extends ChromeDriver {
 
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[onclick='PaymentInfo.save()']"))).click();
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[onclick='ConfirmOrder.save()"))).click();
-
-
-
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='title']")));
 
         String confirm = driver.findElement(By.xpath("//div[@class='title']")).getText();
